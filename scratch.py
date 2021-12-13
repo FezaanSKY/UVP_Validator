@@ -1,14 +1,16 @@
 from xmlschema import validate
-#import xmlschema
+
 print("===== XSD Validation===== ")
-#import xmlschema
-validate('ADI_DPL_Archive_EP.xml','MD-SP-VODContainer-I01.xsd' )
 
-# import xmlschema
-# # Baba script
-# schema = xmlschema.XMLSchema('MD-SP-VODContainer-I01.xsd')
-# schema.validate('ADI_DPL_Archive_EP.xml')
-
+from xmlschema.validators.exceptions import XMLSchemaDecodeError
+try:
+    if validate('ADI_DPL_Archive_EP.xml', 'ADI_XSD.xsd'):
+        print('Not valid! :(')
+    else:
+        print('Pass!')
+except XMLSchemaDecodeError as error:
+    print(error.message)
+    print(error)
 
 
 import xml.etree.ElementTree as ET
