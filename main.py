@@ -3,9 +3,10 @@ import XML_PARSE as xp
 
 sg.theme("DarkTeal2")
 layout = [[sg.T("")], [sg.Text("Choose a file: "), sg.Input(), sg.FileBrowse(key="-IN-")], [sg.Button("Submit")],
-          [sg.Text('XSD', auto_size_text=True, justification='right', key="-OUTPUT-")],
-          [sg.Text('XMLPARSE', auto_size_text=True, justification='right', key="-OUTPUT2-")],
-          [sg.Text(auto_size_text=True, justification='right', key="-OUTPUT3-")]]
+          [sg.Text('Untar', auto_size_text=True, justification='right', key="-OUTPUT3-")],
+          [sg.Text('XSD Validation', auto_size_text=True, justification='right', key="-OUTPUT-")],
+          [sg.Text('XMLPARSE', auto_size_text=True, justification='right', key="-OUTPUT2-")]]
+
 
 
 ###Building Window

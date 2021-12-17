@@ -15,14 +15,15 @@ def untar(filelocation):
     # get the names of files in tar file
     namelist = file_obj.getnames()
     # print the filenames
-    print("The following files are being extracted:")
+    inside_tar = ""
+    message = ("The following files are being extracted:")
     for name in namelist:
-        print(name)
+        inside_tar += makeline(name)
     # extract all files
     file = file_obj.extractall(f"{filename}_Extracted")
      # close file
     file_obj.close()
-
+    return message + "\n" + inside_tar
 
 
 def xsd_validation(filelocation):
