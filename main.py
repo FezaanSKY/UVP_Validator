@@ -1,5 +1,5 @@
+#main view
 from View import View
-
 
 def Main():
     view = View()
