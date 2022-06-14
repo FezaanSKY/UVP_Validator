@@ -3,10 +3,16 @@ import os
 import xml.etree.ElementTree as ET
 from checksums import calculate_md5_checksum_filesize
 
+class db_Validation_Holder:
+    providerID = ''
+    dplTemplateID = ''
+    genre = ''
+    offerType = ''
 
 class ADIParser:
     namespace = None
     environment = None
+    validation_holder = db_Validation_Holder()
     def __init__(self, environment):
         self.namespace = {'xmlns': "http://www.cablelabs.com/namespaces/metadata/xsd/vod30/1",
                      'content': "http://www.cablelabs.com/namespaces/metadata/xsd/content/1",
@@ -59,6 +65,8 @@ class ADIParser:
         return self.__GeneralInfo__(root, self.namespace), self.__VideoInfo__(root, self.namespace), self.__ImageInfo__(root, self.namespace)
 
     def __GeneralInfo__(self, root, namespace):
+        self.__populateValidationHolder__(root, namespace)
+        self.__ProviderInfo__(root,namespace)
         result = ""
         result += makeline("=====General Info===== ")
         for ns in root.findall('xmlns:Title', namespace):
@@ -72,23 +80,35 @@ class ADIParser:
                     if ("TitleMedium" in elem.tag):
                         result += makeline("Title Medium:", elem.text)
 
+            if self.validation_holder.providerID == "":
+                result += makeline("ProviderID not found")
+            else:
+                result += makeline("ProviderID:", self.validation_holder.providerID)
+
+
             for title in root.findall('xmlns:Title', namespace):
                 result += makeline("Licence StartDateTime:", title.attrib['startDateTime'], " ",
                                    self.__value_consistency__(root, 'startDateTime', title.attrib['startDateTime']), "\n"
                                     "Licence EndDateTime:", title.attrib['endDateTime'], " ",
                                    self.__value_consistency__(root, 'endDateTime', title.attrib['endDateTime']), "\n",
                                    self.__value_consistency__(root, 'providerVersionNum',     title.attrib['providerVersionNum']) )
-            ## Come back to this split up URID TO provider and asset id
-            # "URIID:", title.attrib['uriId'], " ", value_consistency(root, 'uriId', title.attrib['uriId'])
 
         for times in root.findall('xmlns:Offer', namespace):
             result += makeline("Offer StartDateTime:", times.attrib['startDateTime'], "\n"
-            "Offer EndDateTime:",times.attrib['endDateTime'])
+            "Offer EndDateTime:",times.attrib['endDateTime'],)
+
 
         for terms in root.findall('xmlns:Terms', namespace):
             for elem in terms.iter():
                 if ("TermType" in elem.tag):
                     result += makeline("OfferType:", elem.text)
+
+        if self.validation_holder.genre == "":
+            result += makeline("Genre not found")
+        else:
+            result += makeline("Genre:", self.validation_holder.genre)
+
+
         for offer in root.findall('xmlns:Offer', namespace):
             for elem in offer.iter():
                 if ("epgDateTime" in elem.attrib):
@@ -99,6 +119,23 @@ class ADIParser:
                     result += makeline(str(elem.attrib))
         return result
 
+    def __ProviderInfo__(self, root, namespace):
+        self.validation_holder.providerID = root.find('xmlns:Title', namespace).attrib['uriId'].split('/')[0]
+
+    def __DPLTemplateID__(self, root, namespace):
+        self.validation_holder.dplTemplateID = root.find('xmlns:Movie', namespace)[0][0][0].text
+
+    def __Genre__(self, root, namespace):
+        self.validation_holder.genre = root.find('xmlns:Title', namespace)[5].text
+
+    def __OfferType__(self, root, namespace):
+        self.validation_holder.offerType = root.find('xmlns:Terms', namespace)[0][0].text
+
+    def __populateValidationHolder__(self, root, namespace):
+        self.__ProviderInfo__(root,namespace)
+        self.__DPLTemplateID__(root, namespace)
+        self.__Genre__(root, namespace)
+        self.__OfferType__(root, namespace)
 
 
 

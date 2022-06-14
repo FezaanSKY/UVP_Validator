@@ -1,6 +1,6 @@
 import traceback
 
-from xmlschema.validators.exceptions import XMLSchemaDecodeError
+from xmlschema.validators.exceptions import XMLSchemaDecodeError, XMLSchemaValidationError
 from xmlschema import validate
 
 class Validator:
@@ -12,9 +12,11 @@ class Validator:
     ## Private
     def __xsd_validation__(self, xml_location):
         try:
-            if validate(xml_location, 'ADI_XSD.xsd'):
-                return ('XSD:Validation : \n Not valid! :(')
+            if validate(xml_location, 'schemas/ADI_XSD.xsd'):
+                return (True, 'XSD:Validation : \n Not valid! :(')
             else:
-                return ('XSD:Validation : \n Pass!')
+                return (True, 'XSD:Validation : \n Pass!')
         except XMLSchemaDecodeError as error:
-            return "%s\n%s" % (error.message, traceback.format_exc())
+            return (False, 'XSD:Validation : \n Not valid! :(')
+        except XMLSchemaValidationError as error:
+            return (False, 'XSD:Validation : \n Not valid! :(')
